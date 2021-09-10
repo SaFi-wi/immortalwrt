@@ -152,7 +152,6 @@
 -		} else {
 -			/* 20Mhz Xtal */
 -			cpu_clk = 20 * fbdiv * 1000 * 1000;
-
 +		pll = rt_memc_r32(MEMC_REG_CPU_PLL);
 +		if ((pll & 0x7f0) == 0x2b0) {
 +			volatile u32 i;
