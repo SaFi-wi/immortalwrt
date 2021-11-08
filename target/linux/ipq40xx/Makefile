@@ -7,6 +7,7 @@ FEATURES:=squashfs fpu ramdisk nand
 CPU_TYPE:=cortex-a7
 CPU_SUBTYPE:=neon-vfpv4
 MAINTAINER:=John Crispin <john@phrozen.org>
+SUBTARGETS:=generic
 
 KERNEL_PATCHVER:=5.4
 
@@ -18,8 +19,6 @@ DEFAULT_PACKAGES += \
 	kmod-leds-gpio kmod-gpio-button-hotplug swconfig \
 	kmod-ath10k wpad-openssl uboot-envtools \
 	kmod-usb3 kmod-usb-dwc3 ath10k-firmware-qca4019 \
-	autocore-arm automount autosamba \
-	luci-app-zerotier openssh-sftp-server \
-	e2fsprogs ethtool htop
+	autocore-arm e2fsprogs
 
 $(eval $(call BuildTarget))
