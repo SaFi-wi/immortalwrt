@@ -729,6 +729,16 @@ define Device/iptime_a3004ns-dual
 endef
 TARGET_DEVICES += iptime_a3004ns-dual
 
+define Device/iptime_a6004ns-m
+  IMAGE_SIZE := 16128k
+  UIMAGE_NAME := a6004nm
+  DEVICE_VENDOR := ipTIME
+  DEVICE_MODEL := A6004NS-M
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3 \
+        kmod-usb-ledtrig-usbport
+endef
+TARGET_DEVICES += iptime_a6004ns-m
+
 define Device/iptime_a6ns-m
   IMAGE_SIZE := 16128k
   UIMAGE_NAME := a6nm
@@ -853,6 +863,15 @@ define Device/linksys_ea7xxx
   IMAGE/factory.bin := append-kernel | pad-to $$$$(KERNEL_SIZE) | \
 	append-ubi | check-size | linksys-image type=$$$$(LINKSYS_HWNAME)
 endef
+
+define Device/linksys_ea6350-v4
+	$(Device/linksys_ea7xxx)
+	DEVICE_MODEL := EA6350
+	DEVICE_VARIANT := v4
+	LINKSYS_HWNAME := EA6350
+	DEVICE_PACKAGES += kmod-mt7603 kmod-mt7663-firmware-ap
+endef
+TARGET_DEVICES += linksys_ea6350-v4
 
 define Device/linksys_ea7300-v1
   $(Device/linksys_ea7xxx)
@@ -1219,6 +1238,22 @@ define Device/planex_vr500
   SUPPORTED_DEVICES += vr500
 endef
 TARGET_DEVICES += planex_vr500
+
+define Device/raisecom_msg1500-x-00
+  $(Device/uimage-lzma-loader)
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_SIZE := 4096k
+  IMAGE_SIZE := 129280k
+  UBINIZE_OPTS := -E 5
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_VENDOR := RAISECOM
+  DEVICE_MODEL := MSG1500
+  DEVICE_VARIANT := X.00
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3 \
+	kmod-usb-ledtrig-usbport uboot-envtools
+endef
+TARGET_DEVICES += raisecom_msg1500-x-00
 
 define Device/samknows_whitebox-v8
   IMAGE_SIZE := 16064k
