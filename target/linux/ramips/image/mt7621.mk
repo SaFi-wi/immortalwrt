@@ -9,6 +9,18 @@ DEFAULT_SOC := mt7621
 KERNEL_DTB += -d21
 DEVICE_VARS += ELECOM_HWNAME LINKSYS_HWNAME
 
+define Build/beeline-trx
+	echo -ne "hsqs" > $@.hsqs
+	$(STAGING_DIR_HOST)/bin/otrx create $@.trx -M 0x746f435d -f $@ \
+		-a 0x20000 -b 0x420000 -f $@.hsqs -a 1000
+	mv $@.trx $@
+	dd if=/dev/zero bs=1024 count=1 >> $@.tail
+	echo -ne "HDR0" | dd of=$@.tail bs=1 seek=$$((0x10c)) count=4 \
+		conv=notrunc 2>/dev/null
+	dd if=$@.tail >> $@ 2>/dev/null
+	rm $@.hsqs $@.tail
+endef
+
 define Build/elecom-wrc-gs-factory
 	$(eval product=$(word 1,$(1)))
 	$(eval version=$(word 2,$(1)))
@@ -211,6 +223,27 @@ define Device/asus_rt-n56u-b1
 endef
 TARGET_DEVICES += asus_rt-n56u-b1
 
+define Device/beeline_smartbox-flash
+  $(Device/uimage-lzma-loader)
+  DEVICE_VENDOR := Beeline
+  DEVICE_MODEL := SmartBox Flash
+  IMAGE_SIZE := 32768k
+  KERNEL_SIZE := 4352k
+  UBINIZE_OPTS := -E 5
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL := kernel-bin | append-dtb | lzma | loader-kernel | \
+	uImage none | beeline-trx | pad-to $$(KERNEL_SIZE)
+  KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma | loader-kernel | \
+	uImage none
+  IMAGES += factory.trx
+  IMAGE/factory.trx := append-kernel | append-ubi | check-size
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7615e kmod-mt7615-firmware \
+	uboot-envtools
+endef
+TARGET_DEVICES += beeline_smartbox-flash
+
 define Device/buffalo_wsr-1166dhp
   $(Device/uimage-lzma-loader)
   IMAGE/sysupgrade.bin := trx | pad-rootfs | append-metadata
@@ -357,6 +390,17 @@ define Device/dlink_dir-878-a1
 endef
 TARGET_DEVICES += dlink_dir-878-a1
 
+define Device/dlink_dir-878-r1
+  $(Device/dlink_dir-8xx-r1)
+  DEVICE_MODEL := DIR-878
+  DEVICE_VARIANT := R1
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-kernel | append-rootfs | check-size | \
+	sign-dlink-ru 57c5375741c30ca9ebcb36713db4ba51 \
+	ab0dff19af8842cdb70a86b4b68d23f7
+endef
+TARGET_DEVICES += dlink_dir-878-r1
+
 define Device/dlink_dir-882-a1
   $(Device/dlink_dir-8xx-a1)
   DEVICE_MODEL := DIR-882
@@ -376,6 +420,15 @@ define Device/dlink_dir-882-r1
 	ab0dff19af8842cdb70a86b4b68d23f7
 endef
 TARGET_DEVICES += dlink_dir-882-r1
+
+define Device/dual-q_h721
+  $(Device/uimage-lzma-loader)
+  IMAGE_SIZE := 16064k
+  DEVICE_VENDOR := Dual-Q
+  DEVICE_MODEL := H721
+  DEVICE_PACKAGES := kmod-ata-ahci kmod-sdhci-mt7620 kmod-usb3 -wpad-basic-wolfssl
+endef
+TARGET_DEVICES += dual-q_h721
 
 define Device/d-team_newifi-d2
   $(Device/uimage-lzma-loader)
@@ -1415,6 +1468,16 @@ define Device/tplink_re650-v1
 endef
 TARGET_DEVICES += tplink_re650-v1
 
+define Device/tplink_tl-wpa8631p-v3
+  $(Device/tplink-safeloader)
+  DEVICE_MODEL := TL-WPA8631P
+  DEVICE_VARIANT := v3
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615e kmod-mt7663-firmware-ap
+  TPLINK_BOARD_ID := TL-WPA8631P-V3
+  IMAGE_SIZE := 7232k
+endef
+TARGET_DEVICES += tplink_tl-wpa8631p-v3
+
 define Device/ubnt_edgerouter_common
   $(Device/uimage-lzma-loader)
   DEVICE_VENDOR := Ubiquiti
@@ -1628,7 +1691,6 @@ endef
 TARGET_DEVICES += xiaomi_mi-router-ac2100
 
 define Device/xiaomi_mi-router-cr660x
-  $(Device/dsa-migration)
   $(Device/uimage-lzma-loader)
   DEVICE_VENDOR := Xiaomi
   BLOCKSIZE := 128k
@@ -1744,6 +1806,17 @@ define Device/zbtlink_zbt-wg1602-16m
 	kmod-usb-ledtrig-usbport
 endef
 TARGET_DEVICES += zbtlink_zbt-wg1602-16m
+
+define Device/zbtlink_zbt-wg1608-16m
+  $(Device/uimage-lzma-loader)
+  IMAGE_SIZE := 16064k
+  DEVICE_VENDOR := Zbtlink
+  DEVICE_MODEL := ZBT-WG1608
+  DEVICE_VARIANT := 16M
+  DEVICE_PACKAGES := kmod-sdhci-mt7620 kmod-mt7603 kmod-mt7615e \
+	kmod-mt7663-firmware-ap kmod-usb3 kmod-usb-ledtrig-usbport
+endef
+TARGET_DEVICES += zbtlink_zbt-wg1608-16m
 
 define Device/zbtlink_zbt-wg2626
   $(Device/uimage-lzma-loader)
