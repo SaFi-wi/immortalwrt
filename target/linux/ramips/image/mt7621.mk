@@ -782,6 +782,22 @@ define Device/iptime_a3004ns-dual
 endef
 TARGET_DEVICES += iptime_a3004ns-dual
 
+define Device/iptime_a3004t
+  $(Device/uimage-lzma-loader)
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  FILESYSTEMS := squashfs
+  KERNEL_SIZE := 4096k
+  IMAGE_SIZE := 129280k
+  UIMAGE_NAME := a3004t
+  UBINIZE_OPTS := -E 5
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_VENDOR := ipTIME
+  DEVICE_MODEL := A3004T
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3
+endef
+TARGET_DEVICES += iptime_a3004t
+
 define Device/iptime_a6004ns-m
   IMAGE_SIZE := 16128k
   UIMAGE_NAME := a6004nm
@@ -810,6 +826,20 @@ define Device/iptime_a8004t
   DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3
 endef
 TARGET_DEVICES += iptime_a8004t
+
+define Device/iptime_t5004
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_SIZE := 4096k
+  IMAGE_SIZE := 129280k
+  UBINIZE_OPTS := -E 5
+  UIMAGE_NAME := t5004
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_VENDOR := ipTIME
+  DEVICE_MODEL := T5004
+  DEVICE_PACKAGES := -wpad-openssl
+endef
+TARGET_DEVICES += iptime_t5004
 
 define Device/jcg_jhr-ac876m
   IMAGE_SIZE := 16064k
