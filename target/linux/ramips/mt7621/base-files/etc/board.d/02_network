@@ -14,6 +14,7 @@ ramips_setup_interfaces()
 	mikrotik,routerboard-m11g|\
 	netgear,ex6150|\
 	sercomm,na502|\
+	sercomm,na502s|\
 	thunder,timecloud|\
 	tplink,re350-v1|\
 	tplink,re500-v1|\
@@ -41,11 +42,19 @@ ramips_setup_interfaces()
 	jdcloud,re-sp-01b|\
 	lenovo,newifi-d1|\
 	mikrotik,routerboard-m33g|\
+	oraybox,x3a|\
 	xiaomi,mi-router-3g|\
 	xiaomi,mi-router-3g-v2|\
 	xiaomi,mi-router-4|\
 	xiaomi,mi-router-4a-gigabit)
 		ucidef_set_interfaces_lan_wan "lan1 lan2" "wan"
+		;;
+	bolt,arion)
+		ucidef_set_interfaces_lan_wan "lan" "wan"
+		ucidef_set_interface "eth_data" device "modem.103" protocol "static" ipaddr "10.22.127.222" netmask "255.255.255.255"
+		ucidef_set_interface "eth_om" device "modem.4094" protocol "static" ipaddr "169.254.0.2" netmask "255.255.255.252"
+		uci add_list firewall.@zone[1].network='eth_data'
+		uci add_list firewall.@zone[1].network='eth_om'
 		;;
 	d-team,newifi-d2)
 		ucidef_add_switch "switch0" \
@@ -90,7 +99,8 @@ ramips_setup_interfaces()
 			"0:lan" "1:lan" "2:lan" "3:lan" "4:wan" "6@eth0"
 		ucidef_set_interface_lan "eth0.1 ra0 rax0"
 		;;
-	tplink,eap235-wall-v1)
+	tplink,eap235-wall-v1|\
+	tplink,eap615-wall-v1)
 		ucidef_set_interface_lan "lan0 lan1 lan2 lan3"
 		;;
 	tplink,tl-wpa8631p-v3)
@@ -197,6 +207,7 @@ ramips_setup_macs()
 		;;
 	jcg,jhr-ac945m|\
 	wavlink,wl-wn531a6|\
+	wavlink,wl-wn533a8|\
 	winstars,ws-wn583a6|\
 	zbtlink,zbt-we1326|\
 	zbtlink,zbt-wg108|\
